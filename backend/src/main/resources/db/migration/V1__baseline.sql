@@ -1,0 +1,13 @@
+-- V1__baseline.sql
+-- Flyway baseline migration for FPMS.
+--
+-- Intentionally a no-op: it establishes the Flyway schema history on an empty
+-- database so migrations run cleanly on startup. Real schema objects are
+-- introduced by later versioned migrations as each vertical slice lands:
+--   V2 -> users       (Task 4: auth)
+--   V3 -> categories  (Task 5: category management)
+--   V4 -> transactions (Task 6: transactions + monthly statement)
+--
+-- Keeping an explicit baseline avoids an empty-locations error when Flyway is
+-- enabled before any domain tables exist, and gives migrations a stable V1 anchor.
+SELECT 1;
