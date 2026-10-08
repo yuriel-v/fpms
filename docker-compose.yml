@@ -1,0 +1,75 @@
+# =============================================================================
+# FPMS — Docker Compose orchestration
+# =============================================================================
+# Services:
+#   db       — PostgreSQL with a named volume and a healthcheck (ready now).
+#   backend  — Spring Boot API (placeholder until Task 2+; waits for healthy db).
+#   frontend — React/Vite app (placeholder until Task 7+).
+#
+# All configuration comes from environment variables (see `.env.example`).
+# To use an external database, point the datasource/host env vars at it and
+# optionally remove the `db` service — no code changes required.
+# =============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fpms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - fpms-db-data:/var/lib/postgresql/data
+    healthcheck:
+      # pg_isready confirms the server is accepting connections before
+      # dependents (the backend) are allowed to start.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # Placeholder — fleshed out in later tasks (Task 2+: backend bootstrap).
+  # Kept behind the `backend` profile so `docker compose up db` stays focused
+  # on the database for the Task 1 demo, while startup ordering (depends_on with
+  # service_healthy) is already wired for when the real image lands.
+  # ---------------------------------------------------------------------------
+  backend:
+    image: busybox:1.36
+    container_name: fpms-backend
+    profiles: ["backend", "full"]
+    command: ["sh", "-c", "echo 'backend placeholder — implemented in Task 2+'; sleep infinity"]
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Placeholder — fleshed out in later tasks (Task 7+/11: frontend + serve).
+  # ---------------------------------------------------------------------------
+  frontend:
+    image: busybox:1.36
+    container_name: fpms-frontend
+    profiles: ["frontend", "full"]
+    command: ["sh", "-c", "echo 'frontend placeholder — implemented in Task 7+'; sleep infinity"]
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      - backend
+
+volumes:
+  fpms-db-data:
+    name: fpms-db-data
