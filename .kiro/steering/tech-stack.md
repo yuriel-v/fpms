@@ -27,6 +27,11 @@
 - `docker compose up` from a clean checkout must bring up db + backend + frontend, with health checks and startup ordering so the backend waits for a healthy database.
 
 ## Testing
+- **Test-Driven Development (TDD) is the default workflow.** For each unit of
+  behavior, follow red → green → refactor: write a failing test that pins the
+  expected behavior first, confirm it fails for the right reason, then write the
+  minimum production code to make it pass, then refactor with the test as a
+  safety net. Commit tests and the code that satisfies them together.
 - Fast unit tests for the domain; use-case tests with faked ports; web-slice tests for controllers; Testcontainers integration tests for persistence.
 - An **ArchUnit** test enforces the hexagonal dependency direction.
 - Frontend: component tests for the currency formatter, auth forms, protected-route redirect, and statement rendering/totals.

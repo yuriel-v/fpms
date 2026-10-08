@@ -7,7 +7,7 @@
   - _Demo:_ `docker compose up db` brings up a healthy Postgres container you can connect to.
   - _Requirements: 7.1, 7.4_
 
-- [ ] 2. Backend bootstrap with hexagonal layout + health check
+- [x] 2. Backend bootstrap with hexagonal layout + health check
   - Spring Boot 3.x on Java 21; package structure `domain`, `application` (`port.in`, `port.out`, `service`), `adapter.in.web`, `adapter.out.persistence`, `config`.
   - Wire Spring Data JPA + Flyway against the Compose Postgres; add an empty Flyway baseline.
   - Add an ArchUnit test asserting inward dependency direction; expose `/actuator/health`.

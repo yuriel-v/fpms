@@ -38,7 +38,7 @@ flowchart LR
 
 ### Backend package layout (hexagonal)
 ```
-com.fpms
+dev.yuriel.fpms
 ├── domain                  # pure Java: entities, value objects, no framework imports
 │   ├── user
 │   ├── category
@@ -49,7 +49,11 @@ com.fpms
 │   ├── port.out            # outbound ports (repository/security interfaces)
 │   └── service             # implementations orchestrating domain + ports
 ├── adapter
-│   ├── in.web              # REST controllers, request/response DTOs, mappers
+│   ├── in.web              # inbound web adapter, organized by role:
+│   │                       #   controller/  REST controllers (the inbound adapters)
+│   │                       #   dto/         request/response records (dumb carriers)
+│   │                       #   mapper/      DTO <-> port command/result (thin translation)
+│   │                       #   validation/  request-shape validation
 │   └── out.persistence     # JPA entities, Spring Data repos, port implementations
 └── config                  # Spring wiring, security, bean configuration
 ```
@@ -171,6 +175,10 @@ flowchart TB
   `db` service), not a redesign.
 
 ## Testing strategy
+
+Development follows **TDD (red → green → refactor)**: write a failing test that
+specifies the behavior first, watch it fail for the right reason, then write the
+minimum code to pass, then refactor. This applies across every layer below.
 
 - **Domain:** fast unit tests (Money arithmetic, currency guards, invariants).
 - **Application:** use-case tests with faked ports.

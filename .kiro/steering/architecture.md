@@ -22,7 +22,7 @@ Dependencies always point **inward**: `adapter` → `application` → `domain`.
 
 ## Package layout
 ```
-com.fpms
+dev.yuriel.fpms
 ├── domain/{user,category,transaction,money}
 ├── application/{port.in,port.out,service}
 ├── adapter/in/web
