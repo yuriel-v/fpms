@@ -14,7 +14,7 @@
   - _Demo:_ backend starts, `/actuator/health` is UP against the DB, ArchUnit layering test passes.
   - _Requirements: 7.2, 8.1, 8.2_
 
-- [ ] 3. Domain core — Money, Transaction, Category, User
+- [x] 3. Domain core — Money, Transaction, Category, User
   - Pure-Java domain: `Money` (amountMinor + currency, safe arithmetic + currency-mismatch guards), `TransactionType`, `Transaction`, `Category`, `User` (default currency), and id value objects.
   - Define inbound/outbound port interfaces for the use cases to come.
   - No Spring/JPA imports in `domain`; validate invariants in constructors.
