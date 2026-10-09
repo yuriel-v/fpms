@@ -14,8 +14,9 @@
 
 ## Persistence & migrations
 - All schema changes go through **Flyway** versioned SQL migrations; migrations apply automatically on backend startup.
-- JPA entities live only in the persistence adapter and are kept separate from domain types via mappers.
-- Integration tests run against **Testcontainers PostgreSQL**.
+- JPA entities live only in the persistence adapter and are kept separate from domain types via mappers. The entity↔domain mappers are **unit-tested** (no database).
+- Entity/schema agreement is guarded at startup by Hibernate `ddl-auto: validate` against the Flyway-migrated schema; we do not write tests that merely re-verify the framework's own CRUD behavior.
+- Integration tests against **Testcontainers PostgreSQL** are **opt-in and off by default** (see Testing); reserve them for non-trivial, hand-written queries where real SQL correctness matters (e.g. the monthly statement aggregation), not for routine CRUD.
 
 ## Security
 - Passwords hashed with BCrypt. JWT signing secret comes from an environment variable.
@@ -32,7 +33,9 @@
   expected behavior first, confirm it fails for the right reason, then write the
   minimum production code to make it pass, then refactor with the test as a
   safety net. Commit tests and the code that satisfies them together.
-- Fast unit tests for the domain; use-case tests with faked ports; web-slice tests for controllers; Testcontainers integration tests for persistence.
+- The **default build runs fast tests only**: domain unit tests, use-case tests with faked ports, entity↔domain mapper unit tests, and web-slice tests for controllers. `./mvnw test` must never start a database container.
+- **Integration tests are opt-in.** Tag them `@Tag("integration")`; Surefire excludes that tag by default. Run them explicitly via a dedicated Maven profile (`./mvnw verify -Pintegration`). Keep them few and reserved for non-trivial hand-written queries (e.g. the monthly statement) rather than framework-handled CRUD.
+- Do **not** test the framework: Spring Data JPA / Hibernate / the driver are trusted. Cover our own code (mappers, query logic, use cases) and rely on `ddl-auto: validate` for entity/schema drift.
 - An **ArchUnit** test enforces the hexagonal dependency direction.
 - Frontend: component tests for the currency formatter, auth forms, protected-route redirect, and statement rendering/totals.
 
