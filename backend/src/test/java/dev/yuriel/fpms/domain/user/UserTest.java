@@ -1,5 +1,6 @@
 package dev.yuriel.fpms.domain.user;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Currency;
@@ -13,7 +14,8 @@ class UserTest {
     private final UserId id = UserId.newId();
 
     @Test
-    void creates_a_user_with_id_email_hash_and_default_currency() {
+    @DisplayName("Creating a user retains its id, email, password hash and default currency")
+    void whenCreatingUser_thenRetainsIdEmailHashAndDefaultCurrency() {
         User u = User.create(id, "me@example.com", "hashed-pw", "USD");
         assertEquals(id, u.id());
         assertEquals("me@example.com", u.email());
@@ -22,19 +24,22 @@ class UserTest {
     }
 
     @Test
-    void new_user_generates_an_id() {
+    @DisplayName("Creating a new user generates an id")
+    void whenCreatingNewUser_thenGeneratesAnId() {
         User u = User.newUser("me@example.com", "hashed-pw", "BRL");
         assertNotNull(u.id());
     }
 
     @Test
-    void normalizes_email_to_lowercase_and_trimmed() {
+    @DisplayName("Creating a user normalizes the email to lowercase and trimmed")
+    void whenCreatingUser_thenNormalizesEmailToLowercaseAndTrimmed() {
         User u = User.create(id, "  Me@Example.COM  ", "hashed-pw", "USD");
         assertEquals("me@example.com", u.email());
     }
 
     @Test
-    void rejects_null_fields() {
+    @DisplayName("Creating a user with null fields is rejected")
+    void whenCreatingUserWithNullFields_thenThrows() {
         assertThrows(NullPointerException.class, () -> User.create(null, "me@example.com", "h", "USD"));
         assertThrows(NullPointerException.class, () -> User.create(id, null, "h", "USD"));
         assertThrows(NullPointerException.class, () -> User.create(id, "me@example.com", null, "USD"));
@@ -42,23 +47,27 @@ class UserTest {
     }
 
     @Test
-    void rejects_blank_email_and_hash() {
+    @DisplayName("Creating a user with a blank email or hash is rejected")
+    void whenCreatingUserWithBlankEmailOrHash_thenThrows() {
         assertThrows(IllegalArgumentException.class, () -> User.create(id, "   ", "h", "USD"));
         assertThrows(IllegalArgumentException.class, () -> User.create(id, "me@example.com", "  ", "USD"));
     }
 
     @Test
-    void rejects_malformed_email() {
+    @DisplayName("Creating a user with a malformed email is rejected")
+    void whenCreatingUserWithMalformedEmail_thenThrows() {
         assertThrows(IllegalArgumentException.class, () -> User.create(id, "not-an-email", "h", "USD"));
     }
 
     @Test
-    void rejects_unknown_default_currency() {
+    @DisplayName("Creating a user with an unknown default currency is rejected")
+    void whenCreatingUserWithUnknownDefaultCurrency_thenThrows() {
         assertThrows(IllegalArgumentException.class, () -> User.create(id, "me@example.com", "h", "XYZ"));
     }
 
     @Test
-    void changes_default_currency_returning_a_new_instance() {
+    @DisplayName("Changing the default currency returns a new instance and leaves the original unchanged")
+    void whenChangingDefaultCurrency_thenReturnsNewInstanceLeavingOriginalUnchanged() {
         User u = User.create(id, "me@example.com", "h", "USD");
         User changed = u.changeDefaultCurrency(Currency.getInstance("EUR"));
         assertEquals(Currency.getInstance("EUR"), changed.defaultCurrency());

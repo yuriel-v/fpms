@@ -12,6 +12,7 @@ import dev.yuriel.fpms.application.port.out.UserRepository;
 import dev.yuriel.fpms.domain.user.User;
 import dev.yuriel.fpms.domain.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -46,6 +47,7 @@ class AuthServiceTest {
     // ---- register ----------------------------------------------------------
 
     @Test
+    @DisplayName("Registering a new user returns a token and identity and persists the hashed user")
     void whenRegisteringNewUser_thenReturnsTokenAndIdentityAndPersistsHashedUser() {
         AuthResult result = service.register(new RegisterCommand("Me@Example.com", "s3cret", "USD"));
 
@@ -66,6 +68,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Registering with a duplicate email throws and does not save")
     void whenRegisteringWithDuplicateEmail_thenThrowsAndDoesNotSave() {
         users.save(User.newUser("taken@example.com", "hashed:existing", "USD"));
         int before = users.count();
@@ -77,6 +80,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Registering with a case-insensitive duplicate email throws and does not save")
     void whenRegisteringWithCaseInsensitiveDuplicateEmail_thenThrowsAndDoesNotSave() {
         users.save(User.newUser("taken@example.com", "hashed:existing", "USD"));
         int before = users.count();
@@ -90,6 +94,7 @@ class AuthServiceTest {
     // ---- login --------------------------------------------------------------
 
     @Test
+    @DisplayName("Logging in with valid credentials returns a token")
     void whenLoggingInWithValidCredentials_thenReturnsToken() {
         User existing = users.save(User.newUser("me@example.com", hasher.hash("s3cret"), "USD"));
 
@@ -101,12 +106,14 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Logging in with an unknown email throws invalid credentials")
     void whenLoggingInWithUnknownEmail_thenThrowsInvalidCredentials() {
         assertThrows(InvalidCredentialsException.class,
                 () -> service.login(new LoginCommand("nobody@example.com", "whatever")));
     }
 
     @Test
+    @DisplayName("Logging in with the wrong password throws invalid credentials")
     void whenLoggingInWithWrongPassword_thenThrowsInvalidCredentials() {
         users.save(User.newUser("me@example.com", hasher.hash("right"), "USD"));
 
@@ -117,6 +124,7 @@ class AuthServiceTest {
     // ---- getCurrentUser -----------------------------------------------------
 
     @Test
+    @DisplayName("Getting the current user that exists returns the user")
     void whenGettingCurrentUserThatExists_thenReturnsUser() {
         User existing = users.save(User.newUser("me@example.com", "hashed:pw", "USD"));
 
@@ -126,6 +134,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Getting the current user that is absent throws user not found")
     void whenGettingCurrentUserThatIsAbsent_thenThrowsUserNotFound() {
         assertThrows(UserNotFoundException.class,
                 () -> service.getCurrentUser(UserId.newId()));

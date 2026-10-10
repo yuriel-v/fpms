@@ -3,6 +3,7 @@ package dev.yuriel.fpms.domain.transaction;
 import dev.yuriel.fpms.domain.category.CategoryId;
 import dev.yuriel.fpms.domain.money.Money;
 import dev.yuriel.fpms.domain.user.UserId;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -22,7 +23,8 @@ class TransactionTest {
     private final CategoryId category = CategoryId.newId();
 
     @Test
-    void creates_a_fully_specified_transaction_with_a_category() {
+    @DisplayName("Creating a fully specified transaction with a category retains all fields")
+    void whenCreatingFullySpecifiedTransactionWithCategory_thenRetainsAllFields() {
         Transaction t = Transaction.create(
                 id, owner, "March salary", TransactionType.INCOME,
                 amount, "Employer", "Checking account", when, category);
@@ -39,7 +41,8 @@ class TransactionTest {
     }
 
     @Test
-    void category_is_optional_and_absent_when_null() {
+    @DisplayName("Creating a transaction with a null category leaves the category absent")
+    void whenCreatingTransactionWithNullCategory_thenCategoryIsAbsent() {
         Transaction t = Transaction.create(
                 id, owner, "Coffee", TransactionType.EXPENSE,
                 Money.of(450, "USD"), "Wallet", "Cafe", when, null);
@@ -47,7 +50,8 @@ class TransactionTest {
     }
 
     @Test
-    void new_transaction_generates_an_id() {
+    @DisplayName("Creating a new transaction generates an id")
+    void whenCreatingNewTransaction_thenGeneratesAnId() {
         Transaction t = Transaction.newTransaction(
                 owner, "Coffee", TransactionType.EXPENSE,
                 Money.of(450, "USD"), "Wallet", "Cafe", when, null);
@@ -55,7 +59,8 @@ class TransactionTest {
     }
 
     @Test
-    void trims_name_source_and_destination() {
+    @DisplayName("Creating a transaction trims the name, source and destination")
+    void whenCreatingTransaction_thenTrimsNameSourceAndDestination() {
         Transaction t = Transaction.create(
                 id, owner, "  Rent  ", TransactionType.EXPENSE,
                 amount, "  Checking  ", "  Landlord  ", when, null);
@@ -65,7 +70,8 @@ class TransactionTest {
     }
 
     @Test
-    void rejects_null_required_fields() {
+    @DisplayName("Creating a transaction with null required fields is rejected")
+    void whenCreatingTransactionWithNullRequiredFields_thenThrows() {
         assertThrows(NullPointerException.class, () -> Transaction.create(
                 null, owner, "n", TransactionType.INCOME, amount, "f", "t", when, null));
         assertThrows(NullPointerException.class, () -> Transaction.create(
@@ -79,7 +85,8 @@ class TransactionTest {
     }
 
     @Test
-    void rejects_blank_name_source_or_destination() {
+    @DisplayName("Creating a transaction with a blank name, source or destination is rejected")
+    void whenCreatingTransactionWithBlankNameSourceOrDestination_thenThrows() {
         assertThrows(IllegalArgumentException.class, () -> Transaction.create(
                 id, owner, "  ", TransactionType.INCOME, amount, "f", "t", when, null));
         assertThrows(IllegalArgumentException.class, () -> Transaction.create(
@@ -89,7 +96,8 @@ class TransactionTest {
     }
 
     @Test
-    void signed_amount_is_negative_for_expense_and_positive_for_income() {
+    @DisplayName("The signed amount is negative for an expense and positive for income")
+    void whenComputingSignedAmount_thenNegativeForExpenseAndPositiveForIncome() {
         Transaction income = Transaction.create(
                 id, owner, "pay", TransactionType.INCOME,
                 Money.of(1000, "USD"), "f", "t", when, null);
