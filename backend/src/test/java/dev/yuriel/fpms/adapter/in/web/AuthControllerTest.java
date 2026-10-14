@@ -25,65 +25,63 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Unit test for {@link AuthController}: the controller is constructed directly
- * with mocked use-case ports and a real {@link AuthMapperImpl}. It verifies the
- * controller's own behavior — request→command mapping, result→response mapping,
- * and HTTP status — without loading any Spring context. Framework concerns
- * (bean validation, JSON (de)serialization) are intentionally out of scope.
+ * Unit test for {@link AuthController}: the controller is constructed directly with mocked use-case
+ * ports and a real {@link AuthMapperImpl}. It verifies the controller's own behavior —
+ * request→command mapping, result→response mapping, and HTTP status — without loading any Spring
+ * context. Framework concerns (bean validation, JSON (de)serialization) are intentionally out of
+ * scope.
  */
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-    @Mock
-    private RegisterUserUseCase registerUserUseCase;
+  @Mock private RegisterUserUseCase registerUserUseCase;
 
-    @Mock
-    private LoginUseCase loginUseCase;
+  @Mock private LoginUseCase loginUseCase;
 
-    private AuthController controller() {
-        return new AuthController(registerUserUseCase, loginUseCase, new AuthMapperImpl());
-    }
+  private AuthController controller() {
+    return new AuthController(registerUserUseCase, loginUseCase, new AuthMapperImpl());
+  }
 
-    @Test
-    @DisplayName("register maps the request to a command and returns 201 with the token")
-    void whenRegistering_thenMapsCommandAndReturns201() {
-        UserId userId = UserId.of(UUID.randomUUID());
-        when(registerUserUseCase.register(any(RegisterCommand.class)))
-                .thenReturn(new AuthResult("token-123", userId, "user@example.com"));
+  @Test
+  @DisplayName("register maps the request to a command and returns 201 with the token")
+  void whenRegistering_thenMapsCommandAndReturns201() {
+    UserId userId = UserId.of(UUID.randomUUID());
+    when(registerUserUseCase.register(any(RegisterCommand.class)))
+        .thenReturn(new AuthResult("token-123", userId, "user@example.com"));
 
-        ResponseEntity<AuthResponse> response = controller()
-                .register(new RegisterRequest("user@example.com", "secret123", "USD"));
+    ResponseEntity<AuthResponse> response =
+        controller().register(new RegisterRequest("user@example.com", "secret123", "USD"));
 
-        ArgumentCaptor<RegisterCommand> captor = ArgumentCaptor.forClass(RegisterCommand.class);
-        org.mockito.Mockito.verify(registerUserUseCase).register(captor.capture());
-        RegisterCommand command = captor.getValue();
-        assertEquals("user@example.com", command.email());
-        assertEquals("secret123", command.rawPassword());
-        assertEquals("USD", command.defaultCurrencyCode());
+    ArgumentCaptor<RegisterCommand> captor = ArgumentCaptor.forClass(RegisterCommand.class);
+    org.mockito.Mockito.verify(registerUserUseCase).register(captor.capture());
+    RegisterCommand command = captor.getValue();
+    assertEquals("user@example.com", command.email());
+    assertEquals("secret123", command.rawPassword());
+    assertEquals("USD", command.defaultCurrencyCode());
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("token-123", response.getBody().token());
-        assertEquals(userId.value().toString(), response.getBody().userId());
-        assertEquals("user@example.com", response.getBody().email());
-    }
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertEquals("token-123", response.getBody().token());
+    assertEquals(userId.value().toString(), response.getBody().userId());
+    assertEquals("user@example.com", response.getBody().email());
+  }
 
-    @Test
-    @DisplayName("login maps the request to a command and returns 200 with the token")
-    void whenLoggingIn_thenMapsCommandAndReturns200() {
-        UserId userId = UserId.of(UUID.randomUUID());
-        when(loginUseCase.login(any(LoginCommand.class)))
-                .thenReturn(new AuthResult("login-token", userId, "user@example.com"));
+  @Test
+  @DisplayName("login maps the request to a command and returns 200 with the token")
+  void whenLoggingIn_thenMapsCommandAndReturns200() {
+    UserId userId = UserId.of(UUID.randomUUID());
+    when(loginUseCase.login(any(LoginCommand.class)))
+        .thenReturn(new AuthResult("login-token", userId, "user@example.com"));
 
-        ResponseEntity<AuthResponse> response = controller()
-                .login(new LoginRequest("user@example.com", "secret123"));
+    ResponseEntity<AuthResponse> response =
+        controller().login(new LoginRequest("user@example.com", "secret123"));
 
-        ArgumentCaptor<LoginCommand> captor = ArgumentCaptor.forClass(LoginCommand.class);
-        org.mockito.Mockito.verify(loginUseCase).login(captor.capture());
-        assertEquals("user@example.com", captor.getValue().email());
-        assertEquals("secret123", captor.getValue().rawPassword());
+    ArgumentCaptor<LoginCommand> captor = ArgumentCaptor.forClass(LoginCommand.class);
+    org.mockito.Mockito.verify(loginUseCase).login(captor.capture());
+    assertEquals("user@example.com", captor.getValue().email());
+    assertEquals("secret123", captor.getValue().rawPassword());
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("login-token", response.getBody().token());
-        assertEquals("user@example.com", response.getBody().email());
-    }
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("login-token", response.getBody().token());
+    assertEquals("user@example.com", response.getBody().email());
+  }
 }

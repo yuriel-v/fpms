@@ -5,5 +5,4 @@ package dev.yuriel.fpms.adapter.in.web.dto;
  *
  * @param message a short, human-readable description of the error
  */
-public record ErrorResponse(String message) {
-}
+public record ErrorResponse(String message) {}

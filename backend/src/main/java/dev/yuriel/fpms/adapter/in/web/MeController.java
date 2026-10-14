@@ -14,19 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Inbound web adapter exposing the current-user endpoint.
  *
- * <p>The {@link UserId} principal is placed into the security context by the
- * JWT filter and resolved here via {@link AuthenticationPrincipal}.
+ * <p>The {@link UserId} principal is placed into the security context by the JWT filter and
+ * resolved here via {@link AuthenticationPrincipal}.
  */
 @RestController
 @RequiredArgsConstructor
 public class MeController {
 
-    private final GetCurrentUserUseCase getCurrentUserUseCase;
-    private final AuthMapper authMapper;
+  private final GetCurrentUserUseCase getCurrentUserUseCase;
+  private final AuthMapper authMapper;
 
-    @GetMapping("/api/me")
-    public ResponseEntity<UserResponse> me(@AuthenticationPrincipal UserId userId) {
-        User user = getCurrentUserUseCase.getCurrentUser(userId);
-        return ResponseEntity.ok(authMapper.toResponse(user));
-    }
+  @GetMapping("/api/me")
+  public ResponseEntity<UserResponse> me(@AuthenticationPrincipal UserId userId) {
+    User user = getCurrentUserUseCase.getCurrentUser(userId);
+    return ResponseEntity.ok(authMapper.toResponse(user));
+  }
 }

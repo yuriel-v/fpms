@@ -18,27 +18,28 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Inbound web adapter exposing the public authentication endpoints.
  *
- * <p>Depends only on inbound port interfaces; it maps web DTOs to commands and
- * use-case results back to responses at the web edge.
+ * <p>Depends only on inbound port interfaces; it maps web DTOs to commands and use-case results
+ * back to responses at the web edge.
  */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final RegisterUserUseCase registerUserUseCase;
-    private final LoginUseCase loginUseCase;
-    private final AuthMapper authMapper;
+  private final RegisterUserUseCase registerUserUseCase;
+  private final LoginUseCase loginUseCase;
+  private final AuthMapper authMapper;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse body = authMapper.toResponse(registerUserUseCase.register(authMapper.toCommand(request)));
-        return ResponseEntity.status(HttpStatus.CREATED).body(body);
-    }
+  @PostMapping("/register")
+  public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    AuthResponse body =
+        authMapper.toResponse(registerUserUseCase.register(authMapper.toCommand(request)));
+    return ResponseEntity.status(HttpStatus.CREATED).body(body);
+  }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse body = authMapper.toResponse(loginUseCase.login(authMapper.toCommand(request)));
-        return ResponseEntity.ok(body);
-    }
+  @PostMapping("/login")
+  public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    AuthResponse body = authMapper.toResponse(loginUseCase.login(authMapper.toCommand(request)));
+    return ResponseEntity.ok(body);
+  }
 }
