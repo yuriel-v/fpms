@@ -24,6 +24,12 @@
 - **One mapper per feature** by default (e.g. `AuthMapper`), covering both directions. **Split into separate request/response mappers only when either side has more than 3 DTOs.**
 - Mappers live in the adapter that owns them (`adapter/in/web/mapper`, `adapter/out/persistence`); they are unit-tested without a database.
 
+## Lombok
+- Use **Lombok** to hide boilerplate everywhere it applies (controllers, services, adapters, JPA entities, tests) — anything Lombok can generate should not be written by hand (no explicit required-args/all-args/no-args constructors, getters, or setters in sight).
+- Prefer `@RequiredArgsConstructor` for constructor injection on Spring beans. JPA entities use `@Getter`/`@Setter`/`@NoArgsConstructor(access = PROTECTED)`/`@AllArgsConstructor`. Keep hand-written constructors only where they contain logic Lombok cannot generate (e.g. null-checks, `@Value` wiring, validation).
+- **The domain uses plain records by default.** Lombok *is* permitted in the domain purely for boilerplate reduction (e.g. `@Builder` on a many-field aggregate) **only when it does not compromise domain invariants** — never anything that breaks immutability (`@Setter`, `@Data`) or introduces runtime-framework behavior. Lombok's source-only annotations are not a framework dependency, so this does not violate the domain's framework-freedom. The ArchUnit rule targets runtime frameworks (Spring, JPA, Jackson), not Lombok.
+- Lombok runs as an annotation processor ahead of MapStruct; keep `lombok` → `lombok-mapstruct-binding` → `mapstruct-processor` ordering in the compiler plugin's `annotationProcessorPaths`.
+
 ## Security
 - Passwords hashed with BCrypt. JWT signing secret comes from an environment variable.
 - Every data endpoint is scoped to the authenticated user (owner-aware). The application layer resolves a `UserId`, never Spring Security types directly.
