@@ -3,9 +3,8 @@ package dev.yuriel.fpms.adapter.in.web;
 import dev.yuriel.fpms.adapter.in.web.dto.AuthResponse;
 import dev.yuriel.fpms.adapter.in.web.dto.LoginRequest;
 import dev.yuriel.fpms.adapter.in.web.dto.RegisterRequest;
-import dev.yuriel.fpms.application.port.in.LoginCommand;
+import dev.yuriel.fpms.adapter.in.web.mapper.AuthMapper;
 import dev.yuriel.fpms.application.port.in.LoginUseCase;
-import dev.yuriel.fpms.application.port.in.RegisterCommand;
 import dev.yuriel.fpms.application.port.in.RegisterUserUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,24 +26,24 @@ public class AuthController {
 
     private final RegisterUserUseCase registerUserUseCase;
     private final LoginUseCase loginUseCase;
+    private final AuthMapper authMapper;
 
-    public AuthController(RegisterUserUseCase registerUserUseCase, LoginUseCase loginUseCase) {
+    public AuthController(RegisterUserUseCase registerUserUseCase, LoginUseCase loginUseCase,
+                          AuthMapper authMapper) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUseCase = loginUseCase;
+        this.authMapper = authMapper;
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        RegisterCommand command =
-                new RegisterCommand(request.email(), request.password(), request.defaultCurrency());
-        AuthResponse body = AuthResponse.from(registerUserUseCase.register(command));
+        AuthResponse body = authMapper.toResponse(registerUserUseCase.register(authMapper.toCommand(request)));
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginCommand command = new LoginCommand(request.email(), request.password());
-        AuthResponse body = AuthResponse.from(loginUseCase.login(command));
+        AuthResponse body = authMapper.toResponse(loginUseCase.login(authMapper.toCommand(request)));
         return ResponseEntity.ok(body);
     }
 }

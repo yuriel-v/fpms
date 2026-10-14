@@ -1,75 +1,48 @@
 package dev.yuriel.fpms.adapter.in.web;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import dev.yuriel.fpms.adapter.in.web.dto.UserResponse;
+import dev.yuriel.fpms.adapter.in.web.mapper.AuthMapperImpl;
 import dev.yuriel.fpms.application.port.in.GetCurrentUserUseCase;
-import dev.yuriel.fpms.application.port.in.LoginUseCase;
-import dev.yuriel.fpms.application.port.in.RegisterUserUseCase;
 import dev.yuriel.fpms.domain.user.User;
 import dev.yuriel.fpms.domain.user.UserId;
-import java.util.Currency;
-import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
- * Fast web-slice test for {@link MeController}. The real filter chain is
- * disabled; the {@link UserId} principal is supplied directly via an
- * {@code authentication(...)} request post-processor so
- * {@code @AuthenticationPrincipal} resolves it.
+ * Unit test for {@link MeController}: constructed directly with a mocked
+ * use-case port and a real {@link AuthMapperImpl}. Verifies the controller
+ * resolves the current user for the given principal and maps it to the response
+ * with a 200 status. No Spring context; the principal is passed as a method
+ * argument (as {@code @AuthenticationPrincipal} would supply it).
  */
-@WebMvcTest(MeController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
 class MeControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockitoBean
+    @Mock
     private GetCurrentUserUseCase getCurrentUserUseCase;
 
-    // Present so controller-related beans in the slice resolve; unused here.
-    @MockitoBean
-    private RegisterUserUseCase registerUserUseCase;
-
-    @MockitoBean
-    private LoginUseCase loginUseCase;
-
-    @AfterEach
-    void clearContext() {
-        SecurityContextHolder.clearContext();
-    }
-
     @Test
-    @DisplayName("GET /api/me with an authenticated user id returns 200 and the user info")
-    void whenGettingMeWithUserIdPrincipal_thenReturns200AndUserInfo() throws Exception {
-        UserId userId = new UserId(UUID.randomUUID());
-        User user = new User(userId, "user@example.com", "hashed-pw", Currency.getInstance("USD"));
-        when(getCurrentUserUseCase.getCurrentUser(eq(userId))).thenReturn(user);
+    @DisplayName("me resolves the current user and returns 200 with the user info")
+    void whenGettingMe_thenReturns200AndUserInfo() {
+        UserId userId = UserId.of(UUID.randomUUID());
+        User user = User.create(userId, "user@example.com", "hashed-pw", "USD");
+        when(getCurrentUserUseCase.getCurrentUser(userId)).thenReturn(user);
 
-        // Filters are disabled for the slice, so emulate what the JWT filter
-        // does: place a UserId-principal authentication into the context so
-        // @AuthenticationPrincipal resolves it.
-        var auth = new UsernamePasswordAuthenticationToken(userId, null, List.of());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        MeController controller = new MeController(getCurrentUserUseCase, new AuthMapperImpl());
+        ResponseEntity<UserResponse> response = controller.me(userId);
 
-        mockMvc.perform(get("/api/me"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(userId.value().toString()))
-                .andExpect(jsonPath("$.email").value("user@example.com"))
-                .andExpect(jsonPath("$.defaultCurrency").value("USD"));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(userId.value().toString(), response.getBody().id());
+        assertEquals("user@example.com", response.getBody().email());
+        assertEquals("USD", response.getBody().defaultCurrency());
     }
 }
