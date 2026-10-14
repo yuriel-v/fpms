@@ -49,7 +49,7 @@
 - **Integration tests are opt-in.** Tag them `@Tag("integration")`; Surefire excludes that tag by default. Run them explicitly via a dedicated Maven profile (`./mvnw verify -Pintegration`). Keep them few and reserved for non-trivial hand-written queries (e.g. the monthly statement) rather than framework-handled CRUD.
 - Do **not** test the framework: Spring Data JPA / Hibernate / the driver are trusted. Cover our own code (mappers, query logic, use cases) and rely on `ddl-auto: validate` for entity/schema drift.
 - An **ArchUnit** test enforces the hexagonal dependency direction.
-- **Test naming:** behavioral `@Test` methods follow `when<Condition>_then<Outcome>` (camelCase). Each also carries an explicit JUnit `@DisplayName` written as a readable sentence — Surefire renders the `@DisplayName` (not the method name) in reports, so failures read clearly in the build output. (Declarative ArchUnit `@ArchTest` rules keep their descriptive `.as(...)` names and are exempt.) Surefire is configured with `usePhrasedTestCaseMethodName` so display names surface in the XML reports.
+- **Test naming:** behavioral `@Test` methods follow `when<Condition>Then<Outcome>` (camelCase, no underscores — Sonar `java:S100`). Each also carries an explicit JUnit `@DisplayName` written as a readable sentence — Surefire renders the `@DisplayName` (not the method name) in reports, so failures read clearly in the build output. (Declarative ArchUnit `@ArchTest` rules keep their descriptive `.as(...)` names and are exempt.) Surefire is configured with `usePhrasedTestCaseMethodName` so display names surface in the XML reports.
 - Frontend: component tests for the currency formatter, auth forms, protected-route redirect, and statement rendering/totals.
 
 ## Prerequisites

@@ -21,7 +21,7 @@ class AuthMapperTest {
 
   @Test
   @DisplayName("maps RegisterRequest to RegisterCommand with renamed fields")
-  void whenMappingRegisterRequest_thenRenamesPasswordAndCurrency() {
+  void whenMappingRegisterRequestThenRenamesPasswordAndCurrency() {
     RegisterCommand command =
         mapper.toCommand(new RegisterRequest("me@example.com", "secret123", "USD"));
 
@@ -32,7 +32,7 @@ class AuthMapperTest {
 
   @Test
   @DisplayName("maps LoginRequest to LoginCommand with renamed password")
-  void whenMappingLoginRequest_thenRenamesPassword() {
+  void whenMappingLoginRequestThenRenamesPassword() {
     LoginCommand command = mapper.toCommand(new LoginRequest("me@example.com", "secret123"));
 
     assertEquals("me@example.com", command.email());
@@ -41,7 +41,7 @@ class AuthMapperTest {
 
   @Test
   @DisplayName("maps AuthResult to AuthResponse, stringifying the user id")
-  void whenMappingAuthResult_thenStringifiesUserId() {
+  void whenMappingAuthResultThenStringifiesUserId() {
     UUID raw = UUID.randomUUID();
     AuthResponse response =
         mapper.toResponse(new AuthResult("token-123", UserId.of(raw), "me@example.com"));
@@ -53,7 +53,7 @@ class AuthMapperTest {
 
   @Test
   @DisplayName("maps User to UserResponse, stringifying id and currency")
-  void whenMappingUser_thenStringifiesIdAndCurrency() {
+  void whenMappingUserThenStringifiesIdAndCurrency() {
     UUID raw = UUID.randomUUID();
     User user = User.create(UserId.of(raw), "me@example.com", "hash", "EUR");
 

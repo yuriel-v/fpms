@@ -20,7 +20,7 @@ class JwtTokenServiceTest {
 
   @Test
   @DisplayName("A freshly issued token validates back to the same user id")
-  void whenValidatingFreshlyIssuedToken_thenReturnsSameUserId() {
+  void whenValidatingFreshlyIssuedTokenThenReturnsSameUserId() {
     UserId userId = UserId.newId();
 
     String token = service.issueToken(userId);
@@ -31,7 +31,7 @@ class JwtTokenServiceTest {
 
   @Test
   @DisplayName("A tampered token is rejected")
-  void whenValidatingTamperedToken_thenThrowsInvalidToken() {
+  void whenValidatingTamperedTokenThenThrowsInvalidToken() {
     UserId userId = UserId.newId();
     String token = service.issueToken(userId);
     String tampered = token.substring(0, token.length() - 2) + (token.endsWith("a") ? "bb" : "aa");
@@ -42,14 +42,14 @@ class JwtTokenServiceTest {
 
   @Test
   @DisplayName("A garbage (non-JWT) token is rejected")
-  void whenValidatingGarbageToken_thenThrowsInvalidToken() {
+  void whenValidatingGarbageTokenThenThrowsInvalidToken() {
     assertThatThrownBy(() -> service.validateAndExtractUserId("not-a-jwt"))
         .isInstanceOf(InvalidTokenException.class);
   }
 
   @Test
   @DisplayName("A token signed with a different secret is rejected")
-  void whenValidatingTokenSignedWithDifferentSecret_thenThrowsInvalidToken() {
+  void whenValidatingTokenSignedWithDifferentSecretThenThrowsInvalidToken() {
     UserId userId = UserId.newId();
     String token = service.issueToken(userId);
 
@@ -62,7 +62,7 @@ class JwtTokenServiceTest {
 
   @Test
   @DisplayName("Constructing the service with a too-short secret fails fast")
-  void whenConstructingWithShortSecret_thenFailsFast() {
+  void whenConstructingWithShortSecretThenFailsFast() {
     assertThatThrownBy(() -> new JwtTokenService("too-short", 60))
         .isInstanceOf(IllegalStateException.class);
   }

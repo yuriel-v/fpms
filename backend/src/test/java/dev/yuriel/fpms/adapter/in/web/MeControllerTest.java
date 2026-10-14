@@ -30,7 +30,7 @@ class MeControllerTest {
 
   @Test
   @DisplayName("me resolves the current user and returns 200 with the user info")
-  void whenGettingMe_thenReturns200AndUserInfo() {
+  void whenGettingMeThenReturns200AndUserInfo() {
     UserId userId = UserId.of(UUID.randomUUID());
     User user = User.create(userId, "user@example.com", "hashed-pw", "USD");
     when(getCurrentUserUseCase.getCurrentUser(userId)).thenReturn(user);

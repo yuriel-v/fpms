@@ -23,7 +23,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("Creating a fully specified transaction with a category retains all fields")
-  void whenCreatingFullySpecifiedTransactionWithCategory_thenRetainsAllFields() {
+  void whenCreatingFullySpecifiedTransactionWithCategoryThenRetainsAllFields() {
     Transaction t =
         Transaction.create(
             id,
@@ -49,7 +49,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("Creating a transaction with a null category leaves the category absent")
-  void whenCreatingTransactionWithNullCategory_thenCategoryIsAbsent() {
+  void whenCreatingTransactionWithNullCategoryThenCategoryIsAbsent() {
     Transaction t =
         Transaction.create(
             id,
@@ -66,7 +66,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("Creating a new transaction generates an id")
-  void whenCreatingNewTransaction_thenGeneratesAnId() {
+  void whenCreatingNewTransactionThenGeneratesAnId() {
     Transaction t =
         Transaction.newTransaction(
             owner,
@@ -82,7 +82,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("Creating a transaction trims the name, source and destination")
-  void whenCreatingTransaction_thenTrimsNameSourceAndDestination() {
+  void whenCreatingTransactionThenTrimsNameSourceAndDestination() {
     Transaction t =
         Transaction.create(
             id,
@@ -101,7 +101,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("Creating a transaction with null required fields is rejected")
-  void whenCreatingTransactionWithNullRequiredFields_thenThrows() {
+  void whenCreatingTransactionWithNullRequiredFieldsThenThrows() {
     assertThrows(
         NullPointerException.class,
         () ->
@@ -128,7 +128,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("Creating a transaction with a blank name, source or destination is rejected")
-  void whenCreatingTransactionWithBlankNameSourceOrDestination_thenThrows() {
+  void whenCreatingTransactionWithBlankNameSourceOrDestinationThenThrows() {
     assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -148,7 +148,7 @@ class TransactionTest {
 
   @Test
   @DisplayName("The signed amount is negative for an expense and positive for income")
-  void whenComputingSignedAmount_thenNegativeForExpenseAndPositiveForIncome() {
+  void whenComputingSignedAmountThenNegativeForExpenseAndPositiveForIncome() {
     Transaction income =
         Transaction.create(
             id, owner, "pay", TransactionType.INCOME, Money.of(1000, "USD"), "f", "t", when, null);

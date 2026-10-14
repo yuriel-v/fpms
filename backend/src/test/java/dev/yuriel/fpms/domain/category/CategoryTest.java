@@ -16,7 +16,7 @@ class CategoryTest {
 
   @Test
   @DisplayName("Creating a category retains its id, owner, name and type")
-  void whenCreatingCategory_thenRetainsIdOwnerNameAndType() {
+  void whenCreatingCategoryThenRetainsIdOwnerNameAndType() {
     Category c = Category.create(id, owner, "Salary", TransactionType.INCOME);
     assertEquals(id, c.id());
     assertEquals(owner, c.owner());
@@ -26,7 +26,7 @@ class CategoryTest {
 
   @Test
   @DisplayName("Creating a new category generates an id and sets its fields")
-  void whenCreatingNewCategory_thenGeneratesIdAndSetsFields() {
+  void whenCreatingNewCategoryThenGeneratesIdAndSetsFields() {
     Category c = Category.newCategory(owner, "Groceries", TransactionType.EXPENSE);
     assertNotNull(c.id());
     assertEquals(owner, c.owner());
@@ -36,14 +36,14 @@ class CategoryTest {
 
   @Test
   @DisplayName("Creating a category trims surrounding whitespace from the name")
-  void whenCreatingCategory_thenTrimsWhitespaceFromName() {
+  void whenCreatingCategoryThenTrimsWhitespaceFromName() {
     Category c = Category.newCategory(owner, "  Rent  ", TransactionType.EXPENSE);
     assertEquals("Rent", c.name());
   }
 
   @Test
   @DisplayName("Creating a category with a null id is rejected")
-  void whenCreatingCategoryWithNullId_thenThrows() {
+  void whenCreatingCategoryWithNullIdThenThrows() {
     assertThrows(
         NullPointerException.class,
         () -> Category.create(null, owner, "X", TransactionType.INCOME));
@@ -51,27 +51,27 @@ class CategoryTest {
 
   @Test
   @DisplayName("Creating a category with a null owner is rejected")
-  void whenCreatingCategoryWithNullOwner_thenThrows() {
+  void whenCreatingCategoryWithNullOwnerThenThrows() {
     assertThrows(
         NullPointerException.class, () -> Category.create(id, null, "X", TransactionType.INCOME));
   }
 
   @Test
   @DisplayName("Creating a category with a null type is rejected")
-  void whenCreatingCategoryWithNullType_thenThrows() {
+  void whenCreatingCategoryWithNullTypeThenThrows() {
     assertThrows(NullPointerException.class, () -> Category.create(id, owner, "X", null));
   }
 
   @Test
   @DisplayName("Creating a category with a null name is rejected")
-  void whenCreatingCategoryWithNullName_thenThrows() {
+  void whenCreatingCategoryWithNullNameThenThrows() {
     assertThrows(
         NullPointerException.class, () -> Category.create(id, owner, null, TransactionType.INCOME));
   }
 
   @Test
   @DisplayName("Creating a category with a blank name is rejected")
-  void whenCreatingCategoryWithBlankName_thenThrows() {
+  void whenCreatingCategoryWithBlankNameThenThrows() {
     assertThrows(
         IllegalArgumentException.class,
         () -> Category.create(id, owner, "   ", TransactionType.INCOME));
@@ -79,7 +79,7 @@ class CategoryTest {
 
   @Test
   @DisplayName("Renaming a category returns a new instance leaving the original unchanged")
-  void whenRenamingCategory_thenReturnsNewInstanceLeavingOriginalUnchanged() {
+  void whenRenamingCategoryThenReturnsNewInstanceLeavingOriginalUnchanged() {
     Category c = Category.newCategory(owner, "Food", TransactionType.EXPENSE);
     Category renamed = c.rename("Dining");
     assertEquals("Dining", renamed.name());
@@ -88,7 +88,7 @@ class CategoryTest {
 
   @Test
   @DisplayName("Renaming a category to a blank name is rejected")
-  void whenRenamingCategoryToBlank_thenThrows() {
+  void whenRenamingCategoryToBlankThenThrows() {
     Category c = Category.newCategory(owner, "Food", TransactionType.EXPENSE);
     assertThrows(IllegalArgumentException.class, () -> c.rename("  "));
   }

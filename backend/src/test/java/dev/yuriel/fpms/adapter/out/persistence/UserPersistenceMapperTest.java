@@ -19,7 +19,7 @@ class UserPersistenceMapperTest {
 
   @Test
   @DisplayName("Mapping an entity to domain and back preserves all fields")
-  void whenMappingEntityToDomainAndBack_thenPreservesAllFields() {
+  void whenMappingEntityToDomainAndBackThenPreservesAllFields() {
     UserJpaEntity entity = new UserJpaEntity(uuid, "me@example.com", "hashed-pw", "USD");
 
     User domain = UserPersistenceMapper.toDomain(entity);
@@ -33,7 +33,7 @@ class UserPersistenceMapperTest {
 
   @Test
   @DisplayName("Mapping domain to entity stores the currency as a three-letter ISO code")
-  void whenMappingDomainToEntity_thenStoresCurrencyAsThreeLetterIsoCode() {
+  void whenMappingDomainToEntityThenStoresCurrencyAsThreeLetterIsoCode() {
     User user =
         User.create(UserId.of(uuid), "me@example.com", "hashed-pw", Currency.getInstance("BRL"));
 
@@ -47,7 +47,7 @@ class UserPersistenceMapperTest {
 
   @Test
   @DisplayName("Mapping entity to domain reconstructs the currency from its ISO code")
-  void whenMappingEntityToDomain_thenReconstructsCurrencyFromIsoCode() {
+  void whenMappingEntityToDomainThenReconstructsCurrencyFromIsoCode() {
     UserJpaEntity entity = new UserJpaEntity(uuid, "me@example.com", "hashed-pw", "EUR");
 
     User domain = UserPersistenceMapper.toDomain(entity);

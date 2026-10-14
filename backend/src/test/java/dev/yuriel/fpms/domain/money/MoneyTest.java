@@ -16,7 +16,7 @@ class MoneyTest {
 
   @Test
   @DisplayName("Creating money from minor units and an ISO code retains both")
-  void whenCreatingMoneyFromMinorUnitsAndIsoCode_thenRetainsBoth() {
+  void whenCreatingMoneyFromMinorUnitsAndIsoCodeThenRetainsBoth() {
     Money m = Money.of(1050, "USD");
     assertEquals(1050, m.amountMinor());
     assertEquals(Currency.getInstance("USD"), m.currency());
@@ -24,7 +24,7 @@ class MoneyTest {
 
   @Test
   @DisplayName("Creating money from a Currency instance keeps that instance")
-  void whenCreatingMoneyFromCurrencyInstance_thenKeepsThatInstance() {
+  void whenCreatingMoneyFromCurrencyInstanceThenKeepsThatInstance() {
     Currency brl = Currency.getInstance("BRL");
     Money m = Money.of(999, brl);
     assertSame(brl, m.currency());
@@ -32,25 +32,25 @@ class MoneyTest {
 
   @Test
   @DisplayName("Creating money with a null currency is rejected")
-  void whenCreatingMoneyWithNullCurrency_thenThrows() {
+  void whenCreatingMoneyWithNullCurrencyThenThrows() {
     assertThrows(NullPointerException.class, () -> Money.of(100, (Currency) null));
   }
 
   @Test
   @DisplayName("Creating money with a null currency code is rejected")
-  void whenCreatingMoneyWithNullCurrencyCode_thenThrows() {
+  void whenCreatingMoneyWithNullCurrencyCodeThenThrows() {
     assertThrows(NullPointerException.class, () -> Money.of(100, (String) null));
   }
 
   @Test
   @DisplayName("Creating money with an unknown currency code is rejected")
-  void whenCreatingMoneyWithUnknownCurrencyCode_thenThrows() {
+  void whenCreatingMoneyWithUnknownCurrencyCodeThenThrows() {
     assertThrows(IllegalArgumentException.class, () -> Money.of(100, "XYZ"));
   }
 
   @Test
   @DisplayName("Creating money allows zero and negative amounts")
-  void whenCreatingMoney_thenAllowsZeroAndNegativeAmounts() {
+  void whenCreatingMoneyThenAllowsZeroAndNegativeAmounts() {
     assertEquals(0, Money.of(0, "USD").amountMinor());
     assertEquals(-250, Money.of(-250, "USD").amountMinor());
   }
@@ -59,7 +59,7 @@ class MoneyTest {
 
   @Test
   @DisplayName("Zero money has no amount in the given currency")
-  void whenCreatingZeroMoney_thenHasNoAmountInGivenCurrency() {
+  void whenCreatingZeroMoneyThenHasNoAmountInGivenCurrency() {
     Money zero = Money.zero("EUR");
     assertEquals(0, zero.amountMinor());
     assertEquals(Currency.getInstance("EUR"), zero.currency());
@@ -70,27 +70,27 @@ class MoneyTest {
 
   @Test
   @DisplayName("Adding amounts of the same currency sums them")
-  void whenAddingSameCurrency_thenSumsAmounts() {
+  void whenAddingSameCurrencyThenSumsAmounts() {
     Money result = Money.of(1000, "USD").plus(Money.of(250, "USD"));
     assertEquals(Money.of(1250, "USD"), result);
   }
 
   @Test
   @DisplayName("Subtracting amounts of the same currency subtracts them")
-  void whenSubtractingSameCurrency_thenSubtractsAmounts() {
+  void whenSubtractingSameCurrencyThenSubtractsAmounts() {
     Money result = Money.of(1000, "USD").minus(Money.of(250, "USD"));
     assertEquals(Money.of(750, "USD"), result);
   }
 
   @Test
   @DisplayName("Negating an amount flips its sign")
-  void whenNegatingAmount_thenFlipsSign() {
+  void whenNegatingAmountThenFlipsSign() {
     assertEquals(Money.of(-500, "USD"), Money.of(500, "USD").negate());
   }
 
   @Test
   @DisplayName("Adding different currencies is rejected")
-  void whenAddingDifferentCurrencies_thenThrows() {
+  void whenAddingDifferentCurrenciesThenThrows() {
     Money usd = Money.of(1000, "USD");
     Money eur = Money.of(1000, "EUR");
     assertThrows(CurrencyMismatchException.class, () -> usd.plus(eur));
@@ -98,7 +98,7 @@ class MoneyTest {
 
   @Test
   @DisplayName("Subtracting different currencies is rejected")
-  void whenSubtractingDifferentCurrencies_thenThrows() {
+  void whenSubtractingDifferentCurrenciesThenThrows() {
     Money usd = Money.of(1000, "USD");
     Money eur = Money.of(1000, "EUR");
     assertThrows(CurrencyMismatchException.class, () -> usd.minus(eur));
@@ -108,20 +108,20 @@ class MoneyTest {
 
   @Test
   @DisplayName("Money is equal when amount and currency match")
-  void whenAmountAndCurrencyMatch_thenMoneyIsEqual() {
+  void whenAmountAndCurrencyMatchThenMoneyIsEqual() {
     assertEquals(Money.of(500, "USD"), Money.of(500, "USD"));
     assertEquals(Money.of(500, "USD").hashCode(), Money.of(500, "USD").hashCode());
   }
 
   @Test
   @DisplayName("Money is not equal when the currency differs")
-  void whenCurrencyDiffers_thenMoneyIsNotEqual() {
+  void whenCurrencyDiffersThenMoneyIsNotEqual() {
     assertNotEquals(Money.of(500, "USD"), Money.of(500, "EUR"));
   }
 
   @Test
   @DisplayName("Money is not equal when the amount differs")
-  void whenAmountDiffers_thenMoneyIsNotEqual() {
+  void whenAmountDiffersThenMoneyIsNotEqual() {
     assertNotEquals(Money.of(500, "USD"), Money.of(501, "USD"));
   }
 }

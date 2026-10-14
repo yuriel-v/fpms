@@ -10,19 +10,19 @@ class EmailNormalizerTest {
 
   @Test
   @DisplayName("normalize trims surrounding whitespace and lowercases the address")
-  void whenGivenMixedCaseAndWhitespace_thenTrimsAndLowercases() {
+  void whenGivenMixedCaseAndWhitespaceThenTrimsAndLowercases() {
     assertEquals("me@example.com", EmailNormalizer.normalize("  Me@Example.COM  "));
   }
 
   @Test
   @DisplayName("normalize leaves an already-normalized address unchanged")
-  void whenGivenNormalizedAddress_thenReturnsItUnchanged() {
+  void whenGivenNormalizedAddressThenReturnsItUnchanged() {
     assertEquals("me@example.com", EmailNormalizer.normalize("me@example.com"));
   }
 
   @Test
   @DisplayName("normalize returns null when the input is null")
-  void whenGivenNull_thenReturnsNull() {
+  void whenGivenNullThenReturnsNull() {
     assertNull(EmailNormalizer.normalize(null));
   }
 }

@@ -44,7 +44,7 @@ class AuthControllerTest {
 
   @Test
   @DisplayName("register maps the request to a command and returns 201 with the token")
-  void whenRegistering_thenMapsCommandAndReturns201() {
+  void whenRegisteringThenMapsCommandAndReturns201() {
     UserId userId = UserId.of(UUID.randomUUID());
     when(registerUserUseCase.register(any(RegisterCommand.class)))
         .thenReturn(new AuthResult("token-123", userId, "user@example.com"));
@@ -67,7 +67,7 @@ class AuthControllerTest {
 
   @Test
   @DisplayName("login maps the request to a command and returns 200 with the token")
-  void whenLoggingIn_thenMapsCommandAndReturns200() {
+  void whenLoggingInThenMapsCommandAndReturns200() {
     UserId userId = UserId.of(UUID.randomUUID());
     when(loginUseCase.login(any(LoginCommand.class)))
         .thenReturn(new AuthResult("login-token", userId, "user@example.com"));
