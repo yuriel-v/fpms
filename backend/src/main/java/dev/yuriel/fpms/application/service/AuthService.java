@@ -12,6 +12,7 @@ import dev.yuriel.fpms.application.port.in.UserNotFoundException;
 import dev.yuriel.fpms.application.port.out.PasswordHasher;
 import dev.yuriel.fpms.application.port.out.TokenService;
 import dev.yuriel.fpms.application.port.out.UserRepository;
+import dev.yuriel.fpms.domain.user.EmailNormalizer;
 import dev.yuriel.fpms.domain.user.User;
 import dev.yuriel.fpms.domain.user.UserId;
 
@@ -42,7 +43,7 @@ public class AuthService implements RegisterUserUseCase, LoginUseCase, GetCurren
     public AuthResult register(RegisterCommand command) {
         // Normalize to the same lowercase/trimmed form the domain uses, so a
         // case-only variant of an existing email is detected as a duplicate.
-        String email = normalizeEmail(command.email());
+        String email = EmailNormalizer.normalize(command.email());
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyInUseException("email is already in use");
         }
@@ -57,7 +58,7 @@ public class AuthService implements RegisterUserUseCase, LoginUseCase, GetCurren
 
     @Override
     public AuthResult login(LoginCommand command) {
-        String email = normalizeEmail(command.email());
+        String email = EmailNormalizer.normalize(command.email());
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException("invalid email or password"));
 
@@ -73,9 +74,5 @@ public class AuthService implements RegisterUserUseCase, LoginUseCase, GetCurren
     public User getCurrentUser(UserId userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("no user exists for the given id"));
-    }
-
-    private static String normalizeEmail(String email) {
-        return email == null ? null : email.strip().toLowerCase();
     }
 }

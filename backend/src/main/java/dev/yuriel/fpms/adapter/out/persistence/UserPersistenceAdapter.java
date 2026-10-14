@@ -1,6 +1,7 @@
 package dev.yuriel.fpms.adapter.out.persistence;
 
 import dev.yuriel.fpms.application.port.out.UserRepository;
+import dev.yuriel.fpms.domain.user.EmailNormalizer;
 import dev.yuriel.fpms.domain.user.User;
 import dev.yuriel.fpms.domain.user.UserId;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class UserPersistenceAdapter implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return jpaRepository.findByEmail(normalizeEmail(email))
+        return jpaRepository.findByEmail(EmailNormalizer.normalize(email))
                 .map(UserPersistenceMapper::toDomain);
     }
 
@@ -37,16 +38,12 @@ public class UserPersistenceAdapter implements UserRepository {
 
     @Override
     public boolean existsByEmail(String email) {
-        return jpaRepository.existsByEmail(normalizeEmail(email));
+        return jpaRepository.existsByEmail(EmailNormalizer.normalize(email));
     }
 
     @Override
     public User save(User user) {
         UserJpaEntity saved = jpaRepository.save(UserPersistenceMapper.toEntity(user));
         return UserPersistenceMapper.toDomain(saved);
-    }
-
-    private static String normalizeEmail(String email) {
-        return email == null ? null : email.strip().toLowerCase();
     }
 }
