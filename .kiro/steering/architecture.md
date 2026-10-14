@@ -46,3 +46,13 @@ dev.yuriel.fpms
      assumptions that would block adding frequencies.
    - Transactions will later gain optional links to a **property** and/or an
      **income source**; keep the transaction model open to optional associations.
+7. **Constructor injection only — never field injection.** Avoid
+   `@Autowired` on fields in both production code and tests; it hides
+   dependencies, defeats `final`, and complicates testing. Beans take their
+   collaborators as `final` constructor parameters (Lombok
+   `@RequiredArgsConstructor` is fine once Lombok is in use).
+8. **Controllers are unit-tested with mocked ports** (construct the controller
+   directly, inject mocks). Do **not** use `@WebMvcTest` in the fast unit
+   suite — it loads a partial Spring context and exercises framework behavior
+   (Jackson, bean validation, advice wiring) that is out of a unit's scope.
+   Reserve such coverage for opt-in integration tests.
