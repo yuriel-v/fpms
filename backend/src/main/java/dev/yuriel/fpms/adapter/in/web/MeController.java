@@ -5,6 +5,7 @@ import dev.yuriel.fpms.adapter.in.web.mapper.AuthMapper;
 import dev.yuriel.fpms.application.port.in.GetCurrentUserUseCase;
 import dev.yuriel.fpms.domain.user.User;
 import dev.yuriel.fpms.domain.user.UserId;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,15 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
  * JWT filter and resolved here via {@link AuthenticationPrincipal}.
  */
 @RestController
+@RequiredArgsConstructor
 public class MeController {
 
     private final GetCurrentUserUseCase getCurrentUserUseCase;
     private final AuthMapper authMapper;
-
-    public MeController(GetCurrentUserUseCase getCurrentUserUseCase, AuthMapper authMapper) {
-        this.getCurrentUserUseCase = getCurrentUserUseCase;
-        this.authMapper = authMapper;
-    }
 
     @GetMapping("/api/me")
     public ResponseEntity<UserResponse> me(@AuthenticationPrincipal UserId userId) {

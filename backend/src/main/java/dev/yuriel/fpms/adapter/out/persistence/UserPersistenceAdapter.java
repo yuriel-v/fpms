@@ -5,6 +5,7 @@ import dev.yuriel.fpms.domain.user.EmailNormalizer;
 import dev.yuriel.fpms.domain.user.User;
 import dev.yuriel.fpms.domain.user.UserId;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,13 +17,10 @@ import org.springframework.stereotype.Component;
  * own normalization, so queries find rows regardless of input casing/whitespace.
  */
 @Component
+@RequiredArgsConstructor
 public class UserPersistenceAdapter implements UserRepository {
 
     private final UserJpaRepository jpaRepository;
-
-    public UserPersistenceAdapter(UserJpaRepository jpaRepository) {
-        this.jpaRepository = jpaRepository;
-    }
 
     @Override
     public Optional<User> findByEmail(String email) {

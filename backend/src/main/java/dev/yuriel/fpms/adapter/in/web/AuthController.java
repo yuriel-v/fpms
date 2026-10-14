@@ -7,6 +7,7 @@ import dev.yuriel.fpms.adapter.in.web.mapper.AuthMapper;
 import dev.yuriel.fpms.application.port.in.LoginUseCase;
 import dev.yuriel.fpms.application.port.in.RegisterUserUseCase;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,18 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final RegisterUserUseCase registerUserUseCase;
     private final LoginUseCase loginUseCase;
     private final AuthMapper authMapper;
-
-    public AuthController(RegisterUserUseCase registerUserUseCase, LoginUseCase loginUseCase,
-                          AuthMapper authMapper) {
-        this.registerUserUseCase = registerUserUseCase;
-        this.loginUseCase = loginUseCase;
-        this.authMapper = authMapper;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {

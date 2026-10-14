@@ -5,6 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * JPA persistence model for a user row in the {@code users} table.
@@ -14,9 +19,16 @@ import java.util.UUID;
  * and lives isolated in the persistence package. Column names must match
  * {@code V2__users.sql} exactly, since the app runs Hibernate
  * {@code ddl-auto: validate}.
+ *
+ * <p>The protected no-arg constructor is required by JPA; the all-args
+ * constructor is used by the persistence mapper.
  */
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UserJpaEntity {
 
     @Id
@@ -31,47 +43,4 @@ public class UserJpaEntity {
 
     @Column(name = "default_currency", nullable = false, length = 3)
     private String defaultCurrency;
-
-    /** Required no-arg constructor for JPA. */
-    protected UserJpaEntity() {
-    }
-
-    public UserJpaEntity(UUID id, String email, String passwordHash, String defaultCurrency) {
-        this.id = id;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.defaultCurrency = defaultCurrency;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getDefaultCurrency() {
-        return defaultCurrency;
-    }
-
-    public void setDefaultCurrency(String defaultCurrency) {
-        this.defaultCurrency = defaultCurrency;
-    }
 }

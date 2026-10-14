@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,15 +26,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * the context unauthenticated — it never short-circuits the chain; the
  * configured entry point returns 401 for protected routes.
  */
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final TokenService tokenService;
-
-    public JwtAuthenticationFilter(TokenService tokenService) {
-        this.tokenService = tokenService;
-    }
 
     @Override
     protected void doFilterInternal(
