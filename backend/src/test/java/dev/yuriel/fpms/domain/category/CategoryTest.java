@@ -6,20 +6,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import dev.yuriel.fpms.domain.transaction.TransactionType;
 import dev.yuriel.fpms.domain.user.UserId;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class CategoryTest {
 
-  private final CategoryId id = CategoryId.newId();
-  private final UserId owner = UserId.newId();
+  private static final CategoryId ID = CategoryId.newId();
+  private static final UserId OWNER = UserId.newId();
 
   @Test
   @DisplayName("Creating a category retains its id, owner, name and type")
   void whenCreatingCategoryThenRetainsIdOwnerNameAndType() {
-    Category c = Category.create(id, owner, "Salary", TransactionType.INCOME);
-    assertEquals(id, c.id());
-    assertEquals(owner, c.owner());
+    Category c = Category.create(ID, OWNER, "Salary", TransactionType.INCOME);
+    assertEquals(ID, c.id());
+    assertEquals(OWNER, c.owner());
     assertEquals("Salary", c.name());
     assertEquals(TransactionType.INCOME, c.type());
   }
@@ -27,9 +32,9 @@ class CategoryTest {
   @Test
   @DisplayName("Creating a new category generates an id and sets its fields")
   void whenCreatingNewCategoryThenGeneratesIdAndSetsFields() {
-    Category c = Category.newCategory(owner, "Groceries", TransactionType.EXPENSE);
+    Category c = Category.newCategory(OWNER, "Groceries", TransactionType.EXPENSE);
     assertNotNull(c.id());
-    assertEquals(owner, c.owner());
+    assertEquals(OWNER, c.owner());
     assertEquals("Groceries", c.name());
     assertEquals(TransactionType.EXPENSE, c.type());
   }
@@ -37,36 +42,26 @@ class CategoryTest {
   @Test
   @DisplayName("Creating a category trims surrounding whitespace from the name")
   void whenCreatingCategoryThenTrimsWhitespaceFromName() {
-    Category c = Category.newCategory(owner, "  Rent  ", TransactionType.EXPENSE);
+    Category c = Category.newCategory(OWNER, "  Rent  ", TransactionType.EXPENSE);
     assertEquals("Rent", c.name());
   }
 
-  @Test
-  @DisplayName("Creating a category with a null id is rejected")
-  void whenCreatingCategoryWithNullIdThenThrows() {
-    assertThrows(
-        NullPointerException.class,
-        () -> Category.create(null, owner, "X", TransactionType.INCOME));
+  @ParameterizedTest(name = "null {0}")
+  @MethodSource("creationsWithANullRequiredField")
+  @DisplayName("Creating a category with any null required field is rejected")
+  void whenCreatingCategoryWithNullRequiredFieldThenThrows(String field, Executable creation) {
+    assertThrows(NullPointerException.class, creation);
   }
 
-  @Test
-  @DisplayName("Creating a category with a null owner is rejected")
-  void whenCreatingCategoryWithNullOwnerThenThrows() {
-    assertThrows(
-        NullPointerException.class, () -> Category.create(id, null, "X", TransactionType.INCOME));
-  }
-
-  @Test
-  @DisplayName("Creating a category with a null type is rejected")
-  void whenCreatingCategoryWithNullTypeThenThrows() {
-    assertThrows(NullPointerException.class, () -> Category.create(id, owner, "X", null));
-  }
-
-  @Test
-  @DisplayName("Creating a category with a null name is rejected")
-  void whenCreatingCategoryWithNullNameThenThrows() {
-    assertThrows(
-        NullPointerException.class, () -> Category.create(id, owner, null, TransactionType.INCOME));
+  private static Stream<Arguments> creationsWithANullRequiredField() {
+    return Stream.of(
+        Arguments.of(
+            "id", (Executable) () -> Category.create(null, OWNER, "X", TransactionType.INCOME)),
+        Arguments.of(
+            "owner", (Executable) () -> Category.create(ID, null, "X", TransactionType.INCOME)),
+        Arguments.of("type", (Executable) () -> Category.create(ID, OWNER, "X", null)),
+        Arguments.of(
+            "name", (Executable) () -> Category.create(ID, OWNER, null, TransactionType.INCOME)));
   }
 
   @Test
@@ -74,13 +69,13 @@ class CategoryTest {
   void whenCreatingCategoryWithBlankNameThenThrows() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> Category.create(id, owner, "   ", TransactionType.INCOME));
+        () -> Category.create(ID, OWNER, "   ", TransactionType.INCOME));
   }
 
   @Test
   @DisplayName("Renaming a category returns a new instance leaving the original unchanged")
   void whenRenamingCategoryThenReturnsNewInstanceLeavingOriginalUnchanged() {
-    Category c = Category.newCategory(owner, "Food", TransactionType.EXPENSE);
+    Category c = Category.newCategory(OWNER, "Food", TransactionType.EXPENSE);
     Category renamed = c.rename("Dining");
     assertEquals("Dining", renamed.name());
     assertEquals("Food", c.name());
@@ -89,7 +84,7 @@ class CategoryTest {
   @Test
   @DisplayName("Renaming a category to a blank name is rejected")
   void whenRenamingCategoryToBlankThenThrows() {
-    Category c = Category.newCategory(owner, "Food", TransactionType.EXPENSE);
+    Category c = Category.newCategory(OWNER, "Food", TransactionType.EXPENSE);
     assertThrows(IllegalArgumentException.class, () -> c.rename("  "));
   }
 }
