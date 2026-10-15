@@ -14,8 +14,21 @@
 
 ## Persistence & migrations
 - All schema changes go through **Flyway** versioned SQL migrations; migrations apply automatically on backend startup.
-- JPA entities live only in the persistence adapter and are kept separate from domain types via mappers.
-- Integration tests run against **Testcontainers PostgreSQL**.
+- JPA entities live only in the persistence adapter and are kept separate from domain types via mappers. The entity↔domain mappers are **unit-tested** (no database).
+- Entity/schema agreement is guarded at startup by Hibernate `ddl-auto: validate` against the Flyway-migrated schema; we do not write tests that merely re-verify the framework's own CRUD behavior.
+- Integration tests against **Testcontainers PostgreSQL** are **opt-in and off by default** (see Testing); reserve them for non-trivial, hand-written queries where real SQL correctness matters (e.g. the monthly statement aggregation), not for routine CRUD.
+
+## Mapping (DTO ↔ domain, domain ↔ JPA)
+- Use **MapStruct** mappers; mapping is a mapper's responsibility, not the DTO's or record's (no `from()` factory methods on DTOs).
+- **Prefer MapStruct's generated mappings wherever possible**; fall back to hand-written default/custom methods only for conversions MapStruct cannot derive on its own (e.g. `UserId`↔`String`, `Currency`↔`String`).
+- **One mapper per feature** by default (e.g. `AuthMapper`), covering both directions. **Split into separate request/response mappers only when either side has more than 3 DTOs.**
+- Mappers live in the adapter that owns them (`adapter/in/web/mapper`, `adapter/out/persistence`); they are unit-tested without a database.
+
+## Lombok
+- Use **Lombok** to hide boilerplate everywhere it applies (controllers, services, adapters, JPA entities, tests) — anything Lombok can generate should not be written by hand (no explicit required-args/all-args/no-args constructors, getters, or setters in sight).
+- Prefer `@RequiredArgsConstructor` for constructor injection on Spring beans. JPA entities use `@Getter`/`@Setter`/`@NoArgsConstructor(access = PROTECTED)`/`@AllArgsConstructor`. Keep hand-written constructors only where they contain logic Lombok cannot generate (e.g. null-checks, `@Value` wiring, validation).
+- **The domain uses plain records by default.** Lombok *is* permitted in the domain purely for boilerplate reduction (e.g. `@Builder` on a many-field aggregate) **only when it does not compromise domain invariants** — never anything that breaks immutability (`@Setter`, `@Data`) or introduces runtime-framework behavior. Lombok's source-only annotations are not a framework dependency, so this does not violate the domain's framework-freedom. The ArchUnit rule targets runtime frameworks (Spring, JPA, Jackson), not Lombok.
+- Lombok runs as an annotation processor ahead of MapStruct; keep `lombok` → `lombok-mapstruct-binding` → `mapstruct-processor` ordering in the compiler plugin's `annotationProcessorPaths`.
 
 ## Security
 - Passwords hashed with BCrypt. JWT signing secret comes from an environment variable.
@@ -32,8 +45,11 @@
   expected behavior first, confirm it fails for the right reason, then write the
   minimum production code to make it pass, then refactor with the test as a
   safety net. Commit tests and the code that satisfies them together.
-- Fast unit tests for the domain; use-case tests with faked ports; web-slice tests for controllers; Testcontainers integration tests for persistence.
+- The **default build runs fast tests only**: domain unit tests, use-case tests with faked ports, entity↔domain mapper unit tests, and web-slice tests for controllers. `./mvnw test` must never start a database container.
+- **Integration tests are opt-in.** Tag them `@Tag("integration")`; Surefire excludes that tag by default. Run them explicitly via a dedicated Maven profile (`./mvnw verify -Pintegration`). Keep them few and reserved for non-trivial hand-written queries (e.g. the monthly statement) rather than framework-handled CRUD.
+- Do **not** test the framework: Spring Data JPA / Hibernate / the driver are trusted. Cover our own code (mappers, query logic, use cases) and rely on `ddl-auto: validate` for entity/schema drift.
 - An **ArchUnit** test enforces the hexagonal dependency direction.
+- **Test naming:** behavioral `@Test` methods follow `when<Condition>Then<Outcome>` (camelCase, no underscores — Sonar `java:S100`). Each also carries an explicit JUnit `@DisplayName` written as a readable sentence — Surefire renders the `@DisplayName` (not the method name) in reports, so failures read clearly in the build output. (Declarative ArchUnit `@ArchTest` rules keep their descriptive `.as(...)` names and are exempt.) Surefire is configured with `usePhrasedTestCaseMethodName` so display names surface in the XML reports.
 - Frontend: component tests for the currency formatter, auth forms, protected-route redirect, and statement rendering/totals.
 
 ## Prerequisites

@@ -13,6 +13,11 @@ spring:
   flyway:
     enabled: true
 
+fpms:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:1440}
+
 management:
   endpoints:
     web:

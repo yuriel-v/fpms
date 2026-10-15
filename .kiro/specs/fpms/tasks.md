@@ -21,7 +21,7 @@
   - _Demo:_ `./mvnw test` runs green domain unit tests (Money math, currency guards, invariants).
   - _Requirements: 4.2, 6.*, 8.1_
 
-- [ ] 4. Auth — registration, login, JWT, user persistence
+- [x] 4. Auth — registration, login, JWT, user persistence
   - Register/login use cases, BCrypt hashing, JWT issuance/validation via Spring Security 6, JPA user adapter (owner-aware), Flyway `users` migration (incl. `default_currency`).
   - Keep token concerns in the security adapter behind an outbound port; protect all non-auth endpoints.
   - _Demo:_ `curl` register + login returns a JWT; token unlocks `/api/me`; no token → 401.

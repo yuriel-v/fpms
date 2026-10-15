@@ -1,67 +1,97 @@
 package dev.yuriel.fpms.domain.user;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.Currency;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Currency;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
 class UserTest {
 
-    private final UserId id = UserId.newId();
+  private static final String EMAIL = "me@example.com";
+  private static final String HASH = "hashed-pw";
+  private static final String USD = "USD";
 
-    @Test
-    void creates_a_user_with_id_email_hash_and_default_currency() {
-        User u = User.create(id, "me@example.com", "hashed-pw", "USD");
-        assertEquals(id, u.id());
-        assertEquals("me@example.com", u.email());
-        assertEquals("hashed-pw", u.passwordHash());
-        assertEquals(Currency.getInstance("USD"), u.defaultCurrency());
-    }
+  private static final UserId ID = UserId.newId();
 
-    @Test
-    void new_user_generates_an_id() {
-        User u = User.newUser("me@example.com", "hashed-pw", "BRL");
-        assertNotNull(u.id());
-    }
+  @Test
+  @DisplayName("Creating a user retains its id, email, password hash and default currency")
+  void whenCreatingUserThenRetainsIdEmailHashAndDefaultCurrency() {
+    User u = User.create(ID, EMAIL, HASH, USD);
+    assertEquals(ID, u.id());
+    assertEquals(EMAIL, u.email());
+    assertEquals(HASH, u.passwordHash());
+    assertEquals(Currency.getInstance(USD), u.defaultCurrency());
+  }
 
-    @Test
-    void normalizes_email_to_lowercase_and_trimmed() {
-        User u = User.create(id, "  Me@Example.COM  ", "hashed-pw", "USD");
-        assertEquals("me@example.com", u.email());
-    }
+  @Test
+  @DisplayName("Creating a new user generates an id")
+  void whenCreatingNewUserThenGeneratesAnId() {
+    User u = User.newUser(EMAIL, HASH, "BRL");
+    assertNotNull(u.id());
+  }
 
-    @Test
-    void rejects_null_fields() {
-        assertThrows(NullPointerException.class, () -> User.create(null, "me@example.com", "h", "USD"));
-        assertThrows(NullPointerException.class, () -> User.create(id, null, "h", "USD"));
-        assertThrows(NullPointerException.class, () -> User.create(id, "me@example.com", null, "USD"));
-        assertThrows(NullPointerException.class, () -> User.create(id, "me@example.com", "h", (String) null));
-    }
+  @Test
+  @DisplayName("Creating a user normalizes the email to lowercase and trimmed")
+  void whenCreatingUserThenNormalizesEmailToLowercaseAndTrimmed() {
+    User u = User.create(ID, "  Me@Example.COM  ", HASH, USD);
+    assertEquals(EMAIL, u.email());
+  }
 
-    @Test
-    void rejects_blank_email_and_hash() {
-        assertThrows(IllegalArgumentException.class, () -> User.create(id, "   ", "h", "USD"));
-        assertThrows(IllegalArgumentException.class, () -> User.create(id, "me@example.com", "  ", "USD"));
-    }
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("creationsWithANullRequiredField")
+  @DisplayName("Creating a user with any null required field is rejected")
+  void whenCreatingUserWithNullFieldThenThrows(String field, Executable creation) {
+    assertThrows(NullPointerException.class, creation);
+  }
 
-    @Test
-    void rejects_malformed_email() {
-        assertThrows(IllegalArgumentException.class, () -> User.create(id, "not-an-email", "h", "USD"));
-    }
+  private static Stream<Arguments> creationsWithANullRequiredField() {
+    return Stream.of(
+        Arguments.of("null id", (Executable) () -> User.create(null, EMAIL, HASH, USD)),
+        Arguments.of("null email", (Executable) () -> User.create(ID, null, HASH, USD)),
+        Arguments.of("null hash", (Executable) () -> User.create(ID, EMAIL, null, USD)),
+        Arguments.of(
+            "null currency", (Executable) () -> User.create(ID, EMAIL, HASH, (String) null)));
+  }
 
-    @Test
-    void rejects_unknown_default_currency() {
-        assertThrows(IllegalArgumentException.class, () -> User.create(id, "me@example.com", "h", "XYZ"));
-    }
+  @ParameterizedTest(name = "blank {0}")
+  @ValueSource(strings = {"email", "hash"})
+  @DisplayName("Creating a user with a blank email or hash is rejected")
+  void whenCreatingUserWithBlankEmailOrHashThenThrows(String blankField) {
+    Executable creation =
+        "email".equals(blankField)
+            ? () -> User.create(ID, "   ", HASH, USD)
+            : () -> User.create(ID, EMAIL, "  ", USD);
+    assertThrows(IllegalArgumentException.class, creation);
+  }
 
-    @Test
-    void changes_default_currency_returning_a_new_instance() {
-        User u = User.create(id, "me@example.com", "h", "USD");
-        User changed = u.changeDefaultCurrency(Currency.getInstance("EUR"));
-        assertEquals(Currency.getInstance("EUR"), changed.defaultCurrency());
-        assertEquals(Currency.getInstance("USD"), u.defaultCurrency());
-    }
+  @Test
+  @DisplayName("Creating a user with a malformed email is rejected")
+  void whenCreatingUserWithMalformedEmailThenThrows() {
+    assertThrows(IllegalArgumentException.class, () -> User.create(ID, "not-an-email", HASH, USD));
+  }
+
+  @Test
+  @DisplayName("Creating a user with an unknown default currency is rejected")
+  void whenCreatingUserWithUnknownDefaultCurrencyThenThrows() {
+    assertThrows(IllegalArgumentException.class, () -> User.create(ID, EMAIL, HASH, "XYZ"));
+  }
+
+  @Test
+  @DisplayName(
+      "Changing the default currency returns a new instance and leaves the original unchanged")
+  void whenChangingDefaultCurrencyThenReturnsNewInstanceLeavingOriginalUnchanged() {
+    User u = User.create(ID, EMAIL, HASH, USD);
+    User changed = u.changeDefaultCurrency(Currency.getInstance("EUR"));
+    assertEquals(Currency.getInstance("EUR"), changed.defaultCurrency());
+    assertEquals(Currency.getInstance(USD), u.defaultCurrency());
+  }
 }
