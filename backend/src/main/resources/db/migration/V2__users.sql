@@ -13,6 +13,6 @@ create table users (
     id               uuid         primary key,
     email            varchar(255) not null,
     password_hash    varchar(255) not null,
-    default_currency char(3)      not null,
+    default_currency varchar(3)   not null,
     constraint uq_users_email unique (email)
 );

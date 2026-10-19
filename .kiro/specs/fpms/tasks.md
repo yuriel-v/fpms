@@ -27,7 +27,7 @@
   - _Demo:_ `curl` register + login returns a JWT; token unlocks `/api/me`; no token → 401.
   - _Requirements: 1.*, 2.*_
 
-- [ ] 5. Category management — end-to-end slice
+- [x] 5. Category management — end-to-end slice
   - Use cases + REST adapter + JPA adapter + Flyway `categories` migration; CRUD scoped to the authenticated user.
   - DTOs at the web edge mapped to domain; enforce user-scoping in the application layer.
   - _Demo:_ authenticated API calls create/list/edit/delete categories; user A cannot see user B's categories.
